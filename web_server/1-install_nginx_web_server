@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# This script installs and configures Nginx on a new Ubuntu server.
+
+# Update package lists and install Nginx
+# The '-y' flag automatically answers 'yes' to any prompts.
+sudo apt-get update
+sudo apt-get install -y nginx
+
+# Create a custom index.html file
+# The 'EOF' is a 'here document' that allows for multi-line strings.
+sudo tee /var/www/html/index.html > /dev/null <<EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome!</title>
+</head>
+<body>
+    <h1>Holberton School</h1>
+</body>
+</html>
+EOF
+
+# Ensure Nginx is running and restart to apply changes
+# Using 'service' is a more traditional way compatible with older systems.
+sudo service nginx start
+sudo service nginx restart
+
+echo "Nginx has been installed and configured."
