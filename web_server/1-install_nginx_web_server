@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-# Script to install and configure Nginx web server
+# Installs Nginx and configures it to serve a page with "Holberton School"
 
-# Update package lists and install nginx with automatic yes to prompts
-apt-get update
+set -e
+
+# Install nginx
+apt-get update -y
 apt-get install -y nginx
 
-# Create a simple HTML page with the required string
-echo "Holberton School" > /var/www/html/index.html
+# Update default web page
+echo "Holberton School for the win!" > /var/www/html/index.html
 
-# Ensure nginx is running and restart it
-service nginx start
+# Ensure proper Nginx config is used
+sed -i 's|index.nginx-debian.html|index.html|' /etc/nginx/sites-available/default
 
-# Make sure nginx starts on boot
-update-rc.d nginx defaults
-
-# Verify the content is correct
-curl localhost 
+# Restart Nginx using service (not systemctl)
+service nginx restart
