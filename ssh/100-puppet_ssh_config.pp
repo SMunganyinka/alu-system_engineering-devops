@@ -1,6 +1,11 @@
-# Configure SSH client to use the private key ~/.ssh/school and disable password authentication
+#!/usr/bin/env bash
+# connect with puppet
+file_line { 'Declare_identity_file':
+  path    => '/etc/ssh/ssh_config',
+  line    => 'IdentityFile ~/.ssh/school',
+}
 
-exec { 'configfile':
-  command => 'echo "IdentityFile ~/.ssh/school" >> /etc/ssh/ssh_config; echo "PasswordAuthentication no" >> /etc/ssh/ssh_config',
-  path    => ['/usr/bin', '/bin'],
+file_line { 'Turn_off_passwd_auth':
+  path    => '/etc/ssh/ssh_config',
+  line    => 'PasswordAuthentication no',
 }
