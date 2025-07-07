@@ -1,12 +1,53 @@
 #!/usr/bin/env bash
-# Configure your Nginx server to have a custom 404 page that contains
-# the string Ceci n'est pas une page
+# Script to configure Nginx with a custom 404 page
 
-apt-get -y update
-apt-get -y install nginx
-ufw allow 'Nginx HTTP'
-echo 'Holberton School' > /var/www/html/index.nginx-debian.html
-sed -i '/listen 80 default_server/a rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
-echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
-sed -i '/listen 80 default_server/a error_page 404 /custom_404.html; location = /custom_404.html {root /usr/share/nginx/html; internal;}' /etc/nginx/sites-available/default
-service nginx start
+# Update package lists and install nginx with automatic yes to prompts
+apt-get update
+apt-get install -y nginx
+
+# Create a simple HTML page with the required string
+echo "Holberton School" > /var/www/html/index.html
+
+# Create a custom 404 page with exactly the required string
+echo -n "Ceci n'est pas une page" > /var/www/html/404.html
+
+# Backup the current configuration
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+
+# Create a new configuration with both redirection and 404 page
+cat > /etc/nginx/sites-available/default << 'EOL'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name _;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /redirect_me {
+        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+    }
+
+    error_page 404 /404.html;
+    location = /404.html {
+        root /var/www/html;
+        internal;
+    }
+}
+EOL
+
+# Ensure nginx is running and restart it
+service nginx restart
+
+# Make sure nginx starts on boot
+update-rc.d nginx defaults
+
+# Verify the 404 page content
+echo "Testing 404 page content:"
+curl -s localhost/nonexistent_page
+echo "" 
